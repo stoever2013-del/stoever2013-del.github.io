@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Conectando...</title></head>
+<body style="font-family:system-ui,sans-serif;padding:24px">
+<p id="m">Conectando con tu panel...</p>
+<script>
+  // Rebota el codigo de OAuth (Tesla / Spotify) al panel privado, que solo existe dentro de Tailscale.
+  var destino = "http://100.111.151.28:8765/callback" + location.search;
+  if (location.search.indexOf("code=") === -1 && location.search.indexOf("error=") === -1) {
+    document.getElementById("m").textContent = "No llego ningun codigo.";
+  } else {
+    location.replace(destino);
+    setTimeout(function () {
+      document.getElementById("m").innerHTML = 'Si no avanza, abre Tailscale en este equipo y toca <a href="' + destino + '">aqui</a>.';
+    }, 4000);
+  }
+</script>
+</body></html>
