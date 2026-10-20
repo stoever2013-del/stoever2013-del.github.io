@@ -5,11 +5,16 @@
 <p id="m">Conectando con tu panel...</p>
 <script>
   // Rebota el codigo de OAuth (Tesla / Spotify) al panel privado, que solo existe dentro de Tailscale.
+  // Primero el panel local (tunel adb / la misma PC); si no responde, la IP de Tailscale.
   var destino = "http://100.111.151.28:8765/callback" + location.search;
+  var local = "http://127.0.0.1:8765/callback" + location.search;
   if (location.search.indexOf("code=") === -1 && location.search.indexOf("error=") === -1) {
     document.getElementById("m").textContent = "No llego ningun codigo.";
   } else {
-    location.replace(destino);
+    var listo = false;
+    var ir = function (u) { if (!listo) { listo = true; location.replace(u); } };
+    fetch("http://127.0.0.1:8765/", { mode: "no-cors" }).then(function () { ir(local); }, function () { ir(destino); });
+    setTimeout(function () { ir(destino); }, 2500);
     setTimeout(function () {
       document.getElementById("m").innerHTML = 'Si no avanza, abre Tailscale en este equipo y toca <a href="' + destino + '">aqui</a>.';
     }, 4000);
