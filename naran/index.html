@@ -1,5 +1,7 @@
 <!doctype html>
 <html lang="es"><head><meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-JvuhV9kFfsVPI2bl42PV/zNnXXD58r/zTOMi8epDKng='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'; frame-src 'none'">
+<meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
 <title>Frigobar Naran</title>
@@ -47,6 +49,10 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--warm);outline-offse
 .pay b{font-size:14px}.pay span{font-size:11.5px;color:var(--muted)}
 .pay[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
 .info{background:var(--bg);border-radius:12px;padding:12px;font-size:14px;display:flex;flex-direction:column;gap:8px}
+.bank-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:4px 0}
+.bank-value{min-width:0;overflow-wrap:anywhere}.bank-value b{display:block;user-select:all}
+.copy{flex:none;min-height:44px;padding:8px 12px;border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--accent);font:600 12px var(--body);cursor:pointer}
+.copy-status{min-height:1.45em;color:var(--muted);font-size:13px}
 .close{align-self:flex-end;background:none;border:0;color:var(--muted);font:600 13px var(--body);cursor:pointer}
 .done{text-align:center;display:flex;flex-direction:column;gap:8px;align-items:center;padding:10px 0}
 @media (max-width:380px){.pays{grid-template-columns:1fr}}
@@ -79,7 +85,8 @@ var T={
   airbnb:['Por Airbnb','Llega a tu app'],cash:['Efectivo','En el depto'],xfer:['Transferencia','Cuenta para pagar'],
   iAirbnb:'Te enviamos la solicitud de pago por Airbnb después de tu salida y la aceptas en la app. No tienes que hacer nada más.',
   iCash:'Deja el efectivo sobre la barra de la cocina. Lo recibimos en la limpieza.',
-  iXfer:'<div>Nombre completo: <b data-cuenta="0"></b></div><div>Banco: <b data-cuenta="1"></b></div><div>Cuenta para transferencia: <b data-cuenta="2"></b></div>',
+  iXfer:'<div class="bank-row"><span class="bank-value">Nombre completo<b data-cuenta="0"></b></span></div><div class="bank-row"><span class="bank-value">Banco<b data-cuenta="1"></b></span></div><div class="bank-row"><span class="bank-value">Cuenta para transferencia<b data-cuenta="2"></b></span></div>',
+  copy:'Copiar',copied:'Copiado',copyLabels:['nombre completo','banco','cuenta para transferencia'],copyOK:'Copiado. Ya puedes pegarlo en tu app del banco.',copyFail:'No se pudo copiar. Mantén pulsado el dato para seleccionarlo y copiarlo.',
   confirm:'Listo',ok:'¡Gracias!',okTxt:'Disfrútalo. Al hacer la limpieza revisamos el frigobar y te confirmamos el total por Airbnb.',top:'favorito',combo:'combo'},
  en:{sub:'Help yourself and tap what you take. Pay at the end however you like.',cnt:function(n){return 'Your tab · '+n+' item'+(n===1?'':'s')},go:'View my tab',close:'Close',lang:'Español',
   fr:['Minibar','In the fridge'],dp:['Pantry','Snacks, sweets and wellness'],
@@ -87,11 +94,13 @@ var T={
   airbnb:['Through Airbnb','Arrives in your app'],cash:['Cash','In the apartment'],xfer:['Bank transfer','Account details'],
   iAirbnb:'We send the payment request through Airbnb after check-out and you accept it in the app. Nothing else to do.',
   iCash:'Leave the cash on the kitchen counter. We collect it during cleaning.',
-  iXfer:'<div>Full name: <b data-cuenta="0"></b></div><div>Bank: <b data-cuenta="1"></b></div><div>Transfer account: <b data-cuenta="2"></b></div>',
+  iXfer:'<div class="bank-row"><span class="bank-value">Full name<b data-cuenta="0"></b></span></div><div class="bank-row"><span class="bank-value">Bank<b data-cuenta="1"></b></span></div><div class="bank-row"><span class="bank-value">Transfer account<b data-cuenta="2"></b></span></div>',
+  copy:'Copy',copied:'Copied',copyLabels:['full name','bank','transfer account'],copyOK:'Copied. You can paste it into your banking app.',copyFail:'Could not copy. Press and hold the detail to select and copy it.',
   confirm:'Done',ok:'Thank you!',okTxt:'Enjoy. We check the minibar during cleaning and confirm the total through Airbnb.',top:'favorite',combo:'combo'}
 };
 var lang=(navigator.language||'es').toLowerCase().indexOf('es')===0?'es':'en', pay='airbnb', cart={};
 function $(i){return document.getElementById(i)}
+function eh(s){return String(s).replace(/[&<>"']/g,function(c){return '&#'+c.charCodeAt(0)+';'})}
 function fmt(n){return '$'+n.toLocaleString('es-MX')}
 function all(){var a=[];D.cat.forEach(function(c){a=a.concat(c.items)});return a}
 function render(){
@@ -103,10 +112,10 @@ function render(){
   D.cat.forEach(function(c){
     if(c.seccion!==zona){zona=c.seccion;var z=L[zona==='frigobar'?'fr':'dp'];html+='<h2 class="zona" id="'+zona+'">'+z[0]+'<small>'+z[1]+'</small></h2>'}
     html+='<section id="'+c.id+'"><h2>'+c[lang]+'</h2>'+c.items.map(function(i){
-      var q=cart[i.id]||0,name=lang==='es'?i.es:i.en,note=lang==='es'?i.nes:i.nen;
+      var q=cart[i.id]||0,name=eh(lang==='es'?i.es:i.en),note=eh(lang==='es'?i.nes:i.nen),itemId=eh(i.id);
       return '<div class="item"><div class="n"><div class="name">'+name+(i.tag?'<span class="tag">'+L[i.tag]+'</span>':'')+'</div>'+(note?'<div class="note">'+note+'</div>':'')+'</div>'
-       +'<div class="price">'+fmt(i.p)+'</div><div class="qty">'+(q?'<button type="button" aria-label="−" data-m="'+i.id+'">−</button><span>'+q+'</span>':'')
-       +'<button type="button" class="add" aria-label="+ '+name+'" data-p="'+i.id+'">+</button></div></div>'}).join('')+'</section>'});
+       +'<div class="price">'+fmt(i.p)+'</div><div class="qty">'+(q?'<button type="button" aria-label="−" data-m="'+itemId+'">−</button><span>'+q+'</span>':'')
+       +'<button type="button" class="add" aria-label="+ '+name+'" data-p="'+itemId+'">+</button></div></div>'}).join('')+'</section>'});
   $('menu').innerHTML=html;bar();
 }
 function totals(){var n=0,s=0;all().forEach(function(i){var q=cart[i.id]||0;n+=q;s+=q*i.p});return{n:n,s:s}}
@@ -118,21 +127,42 @@ document.addEventListener('click',function(e){
 });
 function sheet(){
   var L=T[lang],t=totals();
-  var lines=all().filter(function(i){return cart[i.id]}).map(function(i){return '<div><span>'+cart[i.id]+' × '+(lang==='es'?i.es:i.en)+'</span><span>'+fmt(cart[i.id]*i.p)+'</span></div>'}).join('');
+  var lines=all().filter(function(i){return cart[i.id]}).map(function(i){return '<div><span>'+cart[i.id]+' × '+eh(lang==='es'?i.es:i.en)+'</span><span>'+fmt(cart[i.id]*i.p)+'</span></div>'}).join('');
   function opt(k){return '<button type="button" class="pay" data-pay="'+k+'" aria-pressed="'+(pay===k)+'"><b>'+L[k][0]+'</b><span>'+L[k][1]+'</span></button>'}
   var info='<div class="info">'+(pay==='airbnb'?L.iAirbnb:pay==='cash'?L.iCash:L.iXfer)+'</div>';
   $('sb').innerHTML='<div style="display:flex;flex-direction:column;gap:14px"><h3 id="sh-t">'+L.title+'</h3><div class="lines">'+lines+'<div class="sum"><span>'+L.total+'</span><span>'+fmt(t.s)+'</span></div></div><b>'+L.how+'</b><div class="pays">'+opt('airbnb')+opt('cash')+opt('xfer')+'</div>'+info+'<button type="button" class="cta" id="ok">'+L.confirm+'</button></div>';
-  $('sb').querySelectorAll('[data-cuenta]').forEach(function(el){el.textContent=D.pago[+el.dataset.cuenta]});
+  $('sb').querySelectorAll('[data-cuenta]').forEach(function(el){
+    var i=+el.dataset.cuenta;el.textContent=D.pago[i];
+    var b=document.createElement('button');b.type='button';b.className='copy';b.dataset.copy=i;
+    b.textContent=L.copy;b.setAttribute('aria-label',L.copy+' '+L.copyLabels[i]);el.parentNode.parentNode.appendChild(b);
+  });
+  if(pay==='xfer'){var status=document.createElement('div');status.id='copy-status';status.className='copy-status';status.setAttribute('role','status');status.setAttribute('aria-live','polite');$('sb').querySelector('.info').appendChild(status)}
   $('sheet').hidden=false;
+}
+async function copiarDato(b){
+  var i=Number(b.dataset.copy),L=T[lang];if(!Number.isInteger(i)||i<0||i>2)return;
+  var value=D.pago[i],ok=false;
+  b.disabled=true;
+  try{if(navigator.clipboard&&navigator.clipboard.writeText){await navigator.clipboard.writeText(value);ok=true}}catch(e){}
+  if(!ok){
+    var field=document.createElement('textarea');field.value=value;field.readOnly=true;
+    field.style.cssText='position:fixed;left:0;top:0;width:1px;height:1px;opacity:0;font-size:16px';
+    document.body.appendChild(field);
+    try{field.focus();field.select();field.setSelectionRange(0,value.length);ok=document.execCommand('copy')===true}catch(e){}finally{field.remove();b.focus()}
+  }
+  b.disabled=false;if(!b.isConnected)return;
+  b.textContent=ok?L.copied:L.copy;var status=$('copy-status');if(status)status.textContent=ok?L.copyOK:L.copyFail;
+  if(ok)setTimeout(function(){if(b.isConnected)b.textContent=T[lang].copy},2000);
 }
 $('go').onclick=sheet;$('x').onclick=function(){$('sheet').hidden=true};
 $('lang').onclick=function(){lang=lang==='es'?'en':'es';render()};
 $('sheet').addEventListener('click',function(e){
   if(e.target.id==='sheet'){$('sheet').hidden=true;return}
   var b=e.target.closest('[data-pay]');if(b){pay=b.dataset.pay;sheet();return}
+  var copy=e.target.closest('[data-copy]');if(copy){copiarDato(copy);return}
   if(e.target.id==='ok'){var L=T[lang];$('sb').innerHTML='<div class="done"><h3>'+L.ok+'</h3><p>'+L.okTxt+'</p></div>';cart={};render()}
 });
 render();
-if(location.hash){var z=document.querySelector(location.hash);if(z)setTimeout(function(){z.scrollIntoView()},50)}
+if(location.hash){var z=document.getElementById(location.hash.slice(1));if(z)setTimeout(function(){z.scrollIntoView()},50)}
 </script>
 </body></html>
