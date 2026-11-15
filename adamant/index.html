@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Frigobar Adamant</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,500&family=Figtree:wght@400;600;700&display=swap">
+<style>
+:root{--bg:#0E0E0D;--card:#181715;--ink:#EDE3CC;--muted:#A99A78;--accent:#D8B26A;--warm:#E4BE72;--line:#2E2B25;--onaccent:#141310;color-scheme:dark;--display:"Cormorant Garamond",Georgia,serif;--body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 var(--body);-webkit-font-smoothing:antialiased}
+.wrap{max-width:560px;margin:0 auto;padding:max(18px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) 140px max(16px,env(safe-area-inset-left))}
+header{display:flex;flex-direction:column;gap:6px;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.brand{font-size:12px;letter-spacing:.32em;text-transform:uppercase;color:var(--muted);font-weight:600}
+h1{font:500 44px/1 var(--display);margin:0;color:var(--accent)}
+.sub{color:var(--muted);margin:0;font-size:14px}
+.chip{font:600 12px var(--body);border:1px solid var(--line);background:transparent;color:var(--ink);padding:6px 12px;border-radius:999px;cursor:pointer}
+nav{position:sticky;top:0;background:var(--bg);z-index:5;display:flex;gap:6px;overflow-x:auto;padding:12px 0;scrollbar-width:none}
+nav a{flex:none;text-decoration:none;color:var(--ink);font-size:13px;font-weight:600;padding:7px 12px;border-radius:999px;border:1px solid var(--line)}
+.zona{font:italic 500 30px/1.1 var(--display);color:var(--accent);margin:22px 0 2px;scroll-margin-top:60px}
+.zona small{display:block;font:600 11px var(--body);letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-top:4px}
+section{padding:10px 0 4px;scroll-margin-top:60px}
+h2{font:italic 500 22px var(--display);margin:0 0 4px;color:var(--warm)}
+.item{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+.n{min-width:0}.name{font-weight:600}.note{font-size:12.5px;color:var(--muted)}
+.tag{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--warm);margin-left:6px}
+.price{font-variant-numeric:tabular-nums;font-weight:600;color:var(--accent);white-space:nowrap}
+.qty{display:flex;align-items:center;gap:6px}
+.qty button{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:18px;line-height:1;cursor:pointer}
+.qty .add{background:var(--accent);color:var(--onaccent);border-color:var(--accent)}
+.qty span{min-width:18px;text-align:center;font-variant-numeric:tabular-nums;font-weight:700}
+button:focus-visible,a:focus-visible{outline:2px solid var(--warm);outline-offset:2px}
+.bar{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:12px max(16px,env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));z-index:20}
+.bar-in{max-width:560px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.total small{display:block;color:var(--muted);font-size:12px}.total b{font-size:22px;font-variant-numeric:tabular-nums}
+.cta{font:700 15px var(--body);background:var(--accent);color:var(--onaccent);border:0;border-radius:12px;padding:13px 20px;cursor:pointer}
+.cta:disabled{opacity:.4;cursor:default}
+.sheet{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:30;display:flex;align-items:flex-end;justify-content:center}
+.sheet[hidden]{display:none}
+.panel{background:var(--card);width:100%;max-width:560px;border-radius:18px 18px 0 0;max-height:88vh;overflow:auto;padding:18px max(18px,env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom)) max(18px,env(safe-area-inset-left));display:flex;flex-direction:column;gap:14px}
+.panel h3{font:500 28px var(--display);margin:0;color:var(--accent)}
+.lines{display:flex;flex-direction:column;gap:6px;font-variant-numeric:tabular-nums}
+.lines div{display:flex;justify-content:space-between;gap:12px}.lines .sum{border-top:1px solid var(--line);padding-top:8px;font-weight:700;font-size:17px}
+.pays{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.pay{text-align:left;border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:12px;padding:10px;cursor:pointer;font:inherit;display:flex;flex-direction:column;gap:2px}
+.pay b{font-size:14px}.pay span{font-size:11.5px;color:var(--muted)}
+.pay[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.info{background:var(--bg);border-radius:12px;padding:12px;font-size:14px;display:flex;flex-direction:column;gap:8px}
+.close{align-self:flex-end;background:none;border:0;color:var(--muted);font:600 13px var(--body);cursor:pointer}
+.done{text-align:center;display:flex;flex-direction:column;gap:8px;align-items:center;padding:10px 0}
+@media (max-width:380px){.pays{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:no-preference){.panel{animation:up .22s ease-out}@keyframes up{from{transform:translateY(24px);opacity:.6}to{transform:none;opacity:1}}}
+</style></head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="top"><span class="brand">Adamant</span><button class="chip" id="lang" type="button">English</button></div>
+    <h1>Frigobar</h1>
+    <p class="sub" id="sub"></p>
+    <p class="sub" id="disponibilidad"></p>
+  </header>
+  <nav id="nav"></nav>
+  <main id="menu"></main>
+</div>
+<div class="bar"><div class="bar-in">
+  <div class="total"><small id="cnt"></small><b id="tot">$0</b></div>
+  <button class="cta" id="go" type="button" disabled></button>
+</div></div>
+<div class="sheet" id="sheet" hidden><div class="panel" role="dialog" aria-modal="true" aria-labelledby="sh-t">
+  <button class="close" id="x" type="button"></button><div id="sb"></div>
+</div></div>
+<script>
+var D={"depto":"adamant","nombre":"Adamant","cat":[{"id":"bebidas","seccion":"frigobar","es":"Bebidas","en":"Drinks","items":[{"id":"cerveza (botella)","es":"Cerveza Modelo Especial (clara)","en":"Modelo Especial lager (pale)","nes":"botella 355 ml","nen":"355 ml bottle","p":95,"tag":"top"},{"id":"negra modelo","es":"Cerveza Negra Modelo","en":"Negra Modelo beer","nes":"botella 355 ml","nen":"355 ml bottle","p":95,"tag":"top"},{"id":"cerveza (lata)","es":"Cerveza Victoria","en":"Victoria beer","nes":"lata 355 ml","nen":"355 ml can","p":75,"tag":""},{"id":"michelob ultra","es":"Michelob Ultra","en":"Michelob Ultra","nes":"lata 355 ml","nen":"355 ml can","p":80,"tag":""},{"id":"coronita","es":"Coronita","en":"Coronita","nes":"210 ml","nen":"210 ml","p":60,"tag":""},{"id":"corona cero","es":"Corona Cero","en":"Corona Cero","nes":"sin alcohol","nen":"alcohol-free","p":65,"tag":""},{"id":"electrolit","es":"Electrolit","en":"Electrolit","nes":"varios sabores, 625 ml","nen":"assorted flavors, 625 ml","p":85,"tag":"top"},{"id":"topo chico","es":"Topo Chico","en":"Topo Chico","nes":"agua mineral","nen":"sparkling water","p":60,"tag":""},{"id":"coca cola","es":"Coca-Cola","en":"Coca-Cola","nes":"normal o sin azúcar","nen":"regular or zero sugar","p":60,"tag":""},{"id":"botella de vino","es":"Vino tinto","en":"Red wine","nes":"botella 750 ml","nen":"750 ml bottle","p":350,"tag":""}]},{"id":"salados","seccion":"despensa","es":"Snacks salados","en":"Savory snacks","items":[{"id":"papas (grandes)","es":"Papas grandes","en":"Large chips","nes":"bolsa grande","nen":"large bag","p":95,"tag":"top"},{"id":"takis","es":"Takis","en":"Takis","nes":"","nen":"","p":85,"tag":""},{"id":"doritos","es":"Doritos","en":"Doritos","nes":"","nen":"","p":85,"tag":""},{"id":"pringles","es":"Pringles","en":"Pringles","nes":"","nen":"","p":120,"tag":""},{"id":"cacahuates","es":"Cacahuates japoneses","en":"Japanese-style peanuts","nes":"","nen":"","p":65,"tag":""},{"id":"haju (carne seca)","es":"Haju carne seca","en":"Haju beef jerky","nes":"","nen":"","p":175,"tag":""}]},{"id":"dulces","seccion":"despensa","es":"Dulces","en":"Sweets","items":[{"id":"m&ms","es":"M&M’s","en":"M&M’s","nes":"","nen":"","p":85,"tag":""},{"id":"snickers","es":"Snickers","en":"Snickers","nes":"","nen":"","p":70,"tag":""},{"id":"haju (mango)","es":"Haju mango","en":"Haju dried mango","nes":"","nen":"","p":75,"tag":""}]},{"id":"bienestar","seccion":"despensa","es":"Bienestar","en":"Wellness","items":[{"id":"kit manana despues","es":"Kit mañana después","en":"Morning-after kit","nes":"Electrolit + Alka-Seltzer + papas","nen":"Electrolit + Alka-Seltzer + chips","p":199,"tag":"combo"},{"id":"advil max 400mg","es":"Advil Max 400 mg","en":"Advil Max 400 mg","nes":"","nen":"","p":110,"tag":""},{"id":"alka-seltzer","es":"Alka-Seltzer","en":"Alka-Seltzer","nes":"","nen":"","p":45,"tag":""},{"id":"pepto bismol","es":"Pepto-Bismol","en":"Pepto-Bismol","nes":"","nen":"","p":60,"tag":""},{"id":"riopan","es":"Riopan","en":"Riopan","nes":"","nen":"","p":60,"tag":""},{"id":"preservativos","es":"Preservativos","en":"Condoms","nes":"","nen":"","p":195,"tag":""}]}]};
+var T={
+ es:{sub:'Toma lo que se te antoje y anótalo aquí. Al final pagas como prefieras.',cnt:function(n){return 'Tu cuenta · '+n+' producto'+(n===1?'':'s')},go:'Ver mi cuenta',close:'Cerrar',lang:'English',
+  fr:['Frigobar','En el refri'],dp:['Despensa','Snacks, dulces y bienestar'],
+  title:'Tu cuenta',how:'¿Cómo quieres pagar?',total:'Total',
+  airbnb:['Por Airbnb','Llega a tu app'],cash:['Efectivo','En el depto'],xfer:['Transferencia','Datos por chat'],
+  iAirbnb:'Te enviamos la solicitud de pago por Airbnb después de tu salida y la aceptas en la app. No tienes que hacer nada más.',
+  iCash:'Deja el efectivo sobre la barra de la cocina. Lo recibimos en la limpieza.',
+  iXfer:'Escríbenos por el chat de Airbnb y te compartimos ahí, en privado, los datos para transferir.',
+  confirm:'Listo',ok:'¡Gracias!',okTxt:'Disfrútalo. Al hacer la limpieza revisamos el frigobar y te confirmamos el total por Airbnb.',top:'favorito',combo:'combo'},
+ en:{sub:'Help yourself and tap what you take. Pay at the end however you like.',cnt:function(n){return 'Your tab · '+n+' item'+(n===1?'':'s')},go:'View my tab',close:'Close',lang:'Español',
+  fr:['Minibar','In the fridge'],dp:['Pantry','Snacks, sweets and wellness'],
+  title:'Your tab',how:'How would you like to pay?',total:'Total',
+  airbnb:['Through Airbnb','Arrives in your app'],cash:['Cash','In the apartment'],xfer:['Bank transfer','Details via chat'],
+  iAirbnb:'We send the payment request through Airbnb after check-out and you accept it in the app. Nothing else to do.',
+  iCash:'Leave the cash on the kitchen counter. We collect it during cleaning.',
+  iXfer:'Message us in the Airbnb chat and we will share the transfer details with you there, privately.',
+  confirm:'Done',ok:'Thank you!',okTxt:'Enjoy. We check the minibar during cleaning and confirm the total through Airbnb.',top:'favorite',combo:'combo'}
+};
+var lang=(navigator.language||'es').toLowerCase().indexOf('es')===0?'es':'en', pay='airbnb', cart={};
+function $(i){return document.getElementById(i)}
+function fmt(n){return '$'+n.toLocaleString('es-MX')}
+function all(){var a=[];D.cat.forEach(function(c){a=a.concat(c.items)});return a}
+function render(){
+  var L=T[lang];document.documentElement.lang=lang;
+  $('sub').textContent=L.sub;$('lang').textContent=L.lang;$('x').textContent=L.close;
+  if($('disponibilidad'))$('disponibilidad').textContent=lang==='es'?'Menú en preparación. Confirma los productos disponibles en el departamento.':'Menu in preparation. Check the available products in the apartment.';
+  $('nav').innerHTML='<a href="#frigobar">'+L.fr[0]+'</a><a href="#despensa">'+L.dp[0]+'</a>'+D.cat.map(function(c){return '<a href="#'+c.id+'">'+c[lang]+'</a>'}).join('');
+  var html='',zona='';
+  D.cat.forEach(function(c){
+    if(c.seccion!==zona){zona=c.seccion;var z=L[zona==='frigobar'?'fr':'dp'];html+='<h2 class="zona" id="'+zona+'">'+z[0]+'<small>'+z[1]+'</small></h2>'}
+    html+='<section id="'+c.id+'"><h2>'+c[lang]+'</h2>'+c.items.map(function(i){
+      var q=cart[i.id]||0,name=lang==='es'?i.es:i.en,note=lang==='es'?i.nes:i.nen;
+      return '<div class="item"><div class="n"><div class="name">'+name+(i.tag?'<span class="tag">'+L[i.tag]+'</span>':'')+'</div>'+(note?'<div class="note">'+note+'</div>':'')+'</div>'
+       +'<div class="price">'+fmt(i.p)+'</div><div class="qty">'+(q?'<button type="button" aria-label="−" data-m="'+i.id+'">−</button><span>'+q+'</span>':'')
+       +'<button type="button" class="add" aria-label="+ '+name+'" data-p="'+i.id+'">+</button></div></div>'}).join('')+'</section>'});
+  $('menu').innerHTML=html;bar();
+}
+function totals(){var n=0,s=0;all().forEach(function(i){var q=cart[i.id]||0;n+=q;s+=q*i.p});return{n:n,s:s}}
+function bar(){var t=totals();$('cnt').textContent=T[lang].cnt(t.n);$('tot').textContent=fmt(t.s);$('go').textContent=T[lang].go;$('go').disabled=!t.n}
+document.addEventListener('click',function(e){
+  var p=e.target.closest('[data-p]'),m=e.target.closest('[data-m]');
+  if(p){cart[p.dataset.p]=(cart[p.dataset.p]||0)+1;render()}
+  if(m){cart[m.dataset.m]--;if(!cart[m.dataset.m])delete cart[m.dataset.m];render()}
+});
+function sheet(){
+  var L=T[lang],t=totals();
+  var lines=all().filter(function(i){return cart[i.id]}).map(function(i){return '<div><span>'+cart[i.id]+' × '+(lang==='es'?i.es:i.en)+'</span><span>'+fmt(cart[i.id]*i.p)+'</span></div>'}).join('');
+  function opt(k){return '<button type="button" class="pay" data-pay="'+k+'" aria-pressed="'+(pay===k)+'"><b>'+L[k][0]+'</b><span>'+L[k][1]+'</span></button>'}
+  var info='<div class="info">'+(pay==='airbnb'?L.iAirbnb:pay==='cash'?L.iCash:L.iXfer)+'</div>';
+  $('sb').innerHTML='<div style="display:flex;flex-direction:column;gap:14px"><h3 id="sh-t">'+L.title+'</h3><div class="lines">'+lines+'<div class="sum"><span>'+L.total+'</span><span>'+fmt(t.s)+'</span></div></div><b>'+L.how+'</b><div class="pays">'+opt('airbnb')+opt('cash')+opt('xfer')+'</div>'+info+'<button type="button" class="cta" id="ok">'+L.confirm+'</button></div>';
+  $('sheet').hidden=false;
+}
+$('go').onclick=sheet;$('x').onclick=function(){$('sheet').hidden=true};
+$('lang').onclick=function(){lang=lang==='es'?'en':'es';render()};
+$('sheet').addEventListener('click',function(e){
+  if(e.target.id==='sheet'){$('sheet').hidden=true;return}
+  var b=e.target.closest('[data-pay]');if(b){pay=b.dataset.pay;sheet();return}
+  if(e.target.id==='ok'){var L=T[lang];$('sb').innerHTML='<div class="done"><h3>'+L.ok+'</h3><p>'+L.okTxt+'</p></div>';cart={};render()}
+});
+render();
+if(location.hash){var z=document.querySelector(location.hash);if(z)setTimeout(function(){z.scrollIntoView()},50)}
+</script>
+</body></html>
