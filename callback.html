@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="no-referrer"><meta name="robots" content="noindex,nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-Sg93Rk3xf8rSfQrXYpLM0chsLeMRJubz6MbEQ+R9+iA='; style-src 'unsafe-inline'; connect-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'; frame-src 'none'">
+<title>Conectar una cuenta</title>
+<style>body{margin:0;padding:28px;font:16px/1.5 system-ui,sans-serif;background:#f4f1ea;color:#2f3626}main{max-width:420px;margin:12vh auto}h1{font-size:24px}p{overflow-wrap:anywhere}</style></head>
+<body><main><h1>Conectar una cuenta</h1><p id="estado" role="status" aria-live="polite">Abre esta conexión desde tu panel privado.</p><button id="continuar" type="button" hidden style="font:inherit;padding:14px">Continuar</button></main>
+<script>
+(function(){
+  'use strict';
+  var status=document.getElementById('estado'),button=document.getElementById('continuar'),pending,channel;
+  function privateOrigin(origin){
+    try{var u=new URL(origin),p=u.hostname.split('.').map(Number);return u.origin===origin&&['http:','https:'].indexOf(u.protocol)>=0&&(u.hostname==='[::1]'||(p.length===4&&p.every(function(n){return Number.isInteger(n)&&n>=0&&n<=255})&&(p[0]===127||(p[0]===100&&p[1]>=64&&p[1]<=127))))}catch(e){return false}
+  }
+  var query=new URLSearchParams(location.search);
+  if(location.search)history.replaceState(null,'',location.pathname);
+  if(query.has('code')||query.has('error')){
+    if(!/^[A-Za-z0-9_-]{24,256}$/.test(query.get('state')||'')||typeof BroadcastChannel!=='function'){status.textContent='Vuelve al panel privado e inicia de nuevo con un navegador actualizado.';return}
+    var result={type:'conexion-resultado',state:query.get('state'),code:query.get('code')||'',error:query.get('error')||''};
+    channel=new BroadcastChannel('conexion-'+result.state);
+    status.textContent='Completando la conexión en tu panel privado…';
+    channel.onmessage=function(e){if(e.data&&e.data.type==='conexion-recibida'&&e.data.state===result.state){status.textContent=e.data.ok?'Conexión recibida. Puedes cerrar esta pestaña.':'Vuelve al panel privado para revisar el resultado.';channel.close();if(e.data.ok)window.close()}};
+    channel.postMessage(result);
+    setTimeout(function(){channel.close()},600000);
+    return;
+  }
+  if(location.hash!=='#begin'||!window.opener)return;
+  window.addEventListener('message',function(e){
+    if(e.source!==window.opener||!privateOrigin(e.origin)||!e.data)return;
+    if(pending&&e.data.type==='conexion-recibida'&&e.origin===pending.origin&&e.data.state===pending.state){channel.postMessage(e.data);channel.close();if(e.data.ok)setTimeout(function(){window.close()},200);return}
+    if(e.data.type!=='conexion-iniciar'||pending)return;
+    try{
+      var data=e.data,url=new URL(data.url),valid=url.protocol==='https:'&&((url.hostname==='auth.tesla.com'&&url.pathname==='/oauth2/v3/authorize')||(url.hostname==='accounts.spotify.com'&&url.pathname==='/authorize'));
+      if(!valid||url.username||url.password||typeof data.state!=='string'||data.state.length<24||data.state.length>256||url.searchParams.get('state')!==data.state||url.searchParams.get('redirect_uri')!==location.origin+location.pathname)return;
+      if(typeof BroadcastChannel!=='function'){status.textContent='Necesitas un navegador actualizado para completar esta conexión.';return}
+      pending={origin:e.origin,state:data.state,created:Date.now()};
+      channel=new BroadcastChannel('conexion-'+data.state);
+      channel.onmessage=function(message){if(Date.now()-pending.created>600000)return;var result=message.data;if(result&&result.type==='conexion-resultado'&&result.state===pending.state){window.opener.postMessage(result,pending.origin)}};
+      button.hidden=false;button.textContent=url.hostname==='auth.tesla.com'?'Continuar con Tesla':'Continuar con Spotify';
+      status.textContent='Completa la autorización y conserva esta ventana abierta.';
+      button.onclick=function(){var authorization=window.open(url.href,'autorizacion-'+pending.state,'popup,width=520,height=760');status.textContent=authorization?'Completa la autorización en la nueva ventana.':'Permite abrir la ventana y pulsa Continuar de nuevo.'};
+      setTimeout(function(){channel.close();button.hidden=true;status.textContent='Esta conexión venció. Vuelve al panel privado.'},600000);
+    }catch(error){status.textContent='No se pudo preparar la conexión. Vuelve al panel privado.'}
+  });
+  window.opener.postMessage({type:'conexion-lista'},'*');
+})();
+</script></body></html>
